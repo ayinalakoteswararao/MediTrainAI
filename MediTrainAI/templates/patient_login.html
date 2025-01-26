@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Login - MediTrainAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='patient_login.css') }}">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+        }
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .content-side {
+            flex: 1;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        .back-button {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: transform 0.3s;
+        }
+        .back-button:hover {
+            transform: translateX(-5px);
+        }
+        .back-button i {
+            font-size: 1.2rem;
+        }
+        .content-side h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .content-side p {
+            font-size: 1.1rem;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+        .feature-icons {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .feature-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .feature-icon i {
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .feature-icon span {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .auth-side {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .auth-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .logo-wrapper {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+        .logo-icon {
+            font-size: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+        }
+        .form-group label i {
+            color: #2563eb;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Content Side -->
+        <div class="content-side">
+            <a href="{{ url_for('home') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+            <h2>Welcome to MediTrainAI</h2>
+            <p>Your trusted healthcare companion for personalized medical training and support</p>
+            
+            <div class="feature-icons">
+                <div class="feature-icon">
+                    <i class="fas fa-user-md"></i>
+                    <span>Expert Care</span>
+                </div>
+                <div class="feature-icon">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Health Tracking</span>
+                </div>
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Data</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Side -->
+        <div class="auth-side">
+            <div class="auth-card">
+                <div class="logo-container">
+                    <div class="logo-wrapper">
+                        <i class="fas fa-heartbeat logo-icon"></i>
+                    </div>
+                    <h1>Welcome Back!</h1>
+                    <p class="subtitle">Access your personal health dashboard</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="flash-message animate-slide-down">
+                                {{ message }}
+                                <button onclick="this.parentElement.style.display='none'" class="close-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Login Form -->
+                <form method="POST" action="{{ url_for('patient_login') }}" class="login-form">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i>
+                            <span>Username</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            <span>Password</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" name="password" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword()">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Sign In</span>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>New to MediTrainAI?</p>
+                    <a href="{{ url_for('patient_register') }}" class="register-link">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-password i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.classList.remove('fa-eye');
+                toggleBtn.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.classList.remove('fa-eye-slash');
+                toggleBtn.classList.add('fa-eye');
+            }
+        }
+
+        // Form submission animation
+        document.querySelector('form').addEventListener('submit', function() {
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.classList.add('loading');
+        });
+
+        // Input focus effects
+        document.querySelectorAll('.form-group input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('focused');
+            });
+            input.addEventListener('blur', () => {
+                if (!input.value) {
+                    input.parentElement.classList.remove('focused');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

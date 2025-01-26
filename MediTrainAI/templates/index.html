@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrainAI - Your Intelligent Health Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <a href="{{ url_for('home') }}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+            <div class="nav-center">
+                <i class="fas fa-heartbeat"></i>
+                <span class="nav-title">Your Health Assistant</span>
+            </div>
+            <div class="nav-right">
+                <div class="profile-photo">
+                    {% if patient_photo %}
+                        <img src="{{ url_for('static', filename=patient_photo) }}" alt="Profile Photo">
+                    {% else %}
+                        <i class="fas fa-user-circle"></i>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <!-- Enhanced Header Section -->
+        <header class="header animate-on-scroll">
+            <div class="logo-container">
+                <i class="fas fa-heartbeat logo-icon pulse"></i>
+                <h1>MediTrainAI</h1>
+            </div>
+            <p class="tagline">Your Intelligent Health Assistant</p>
+        </header>
+
+        <!-- Enhanced Input Section -->
+        <section class="input-section animate-on-scroll">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2><i class="fas fa-stethoscope"></i> Symptom Analysis</h2>
+                </div>
+                <div class="form-group">
+                    <label for="symptoms">Describe your symptoms</label>
+                    <div class="textarea-wrapper">
+                        <textarea 
+                            id="symptoms" 
+                            placeholder="Example: I have a headache, fever, and feeling tired..."
+                            maxlength="500"
+                            aria-label="Symptom description"
+                        ></textarea>
+                        <div class="placeholder-text">Example: I have a headache, fever, and feeling tired...</div>
+                    </div>
+                </div>
+                <button onclick="analyzeSymptoms()" class="submit-btn">
+                    <div class="btn-content">
+                        <i class="fas fa-microscope"></i>
+                        <span>Analyze Symptoms</span>
+                    </div>
+                    <div class="loading" style="display: none;"></div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Enhanced Results Section -->
+        <section id="resultSection" class="result-section animate-on-scroll" style="display: none;">
+            <div class="result-card">
+                <div class="diagnosis-header">
+                    <div class="header-content">
+                        <h3><i class="fas fa-clipboard-check"></i> Analysis Results</h3>
+                        <div id="severityBadge" class="severity-badge" role="status" onclick="toggleSeverityDetails()"></div>
+                    </div>
+                </div>
+
+                <!-- Severity Details Popup -->
+                <div id="severityDetails" class="severity-details" style="display: none;">
+                    <div class="severity-info">
+                        <div class="severity-level-card low">
+                            <div class="severity-header">
+                                <i class="fas fa-info-circle"></i>
+                                <h4>Low Severity</h4>
+                                <span class="severity-tag">Mild</span>
+                            </div>
+                            <div class="severity-content">
+                                <ul>
+                                    <li>Minor symptoms that don't significantly affect daily life</li>
+                                    <li>Can typically be managed with self-care</li>
+                                    <li>Usually resolves on its own with time</li>
+                                    <li>Regular monitoring recommended</li>
+                                </ul>
+                                <div class="severity-action">
+                                    <i class="fas fa-first-aid"></i>
+                                    <span>Self-care is usually sufficient</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="severity-level-card medium">
+                            <div class="severity-header">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <h4>Medium Severity</h4>
+                                <span class="severity-tag">Regular</span>
+                            </div>
+                            <div class="severity-content">
+                                <ul>
+                                    <li>Noticeable impact on daily activities</li>
+                                    <li>May require medical attention if persistent</li>
+                                    <li>Should be monitored for changes</li>
+                                    <li>Professional evaluation recommended</li>
+                                </ul>
+                                <div class="severity-action">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Consider consulting a healthcare provider</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="severity-level-card high">
+                            <div class="severity-header">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h4>High Severity</h4>
+                                <span class="severity-tag">Serious</span>
+                            </div>
+                            <div class="severity-content">
+                                <ul>
+                                    <li>Significant impact on daily functioning</li>
+                                    <li>Requires prompt medical attention</li>
+                                    <li>May indicate serious condition</li>
+                                    <li>Close monitoring necessary</li>
+                                </ul>
+                                <div class="severity-action">
+                                    <i class="fas fa-hospital"></i>
+                                    <span>Seek immediate medical attention</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rest of the result content -->
+                <div class="result-body">
+                    <!-- Enhanced Confidence Bar -->
+                    <div class="confidence-container">
+                        <div class="section-header">
+                            <h4><i class="fas fa-chart-line"></i> Analysis Confidence</h4>
+                            <button class="info-btn" onclick="toggleInfo('confidence')">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
+                        <div id="confidenceInfo" class="info-panel" style="display: none;">
+                            <div class="confidence-info">
+                                <div class="confidence-level-info">
+                                    <div class="stars-container">
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <p><20%: Low confidence - Limited symptom match</p>
+                                </div>
+                                <div class="confidence-level-info">
+                                    <div class="stars-container">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <p>20-40%: Fair confidence - Some symptoms match</p>
+                                </div>
+                                <div class="confidence-level-info">
+                                    <div class="stars-container">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <p>40-60%: Moderate confidence - Good symptom match</p>
+                                </div>
+                                <div class="confidence-level-info">
+                                    <div class="stars-container">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <p>60-80%: High confidence - Strong symptom match</p>
+                                </div>
+                                <div class="confidence-level-info">
+                                    <div class="stars-container">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <p>80-95%: Very high confidence - Excellent symptom match</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="confidence-display">
+                            <div class="confidence-bar" role="progressbar" aria-label="Confidence level">
+                                <div id="confidenceLevel" class="confidence-level" style="width: 0%"></div>
+                            </div>
+                            <div id="confidenceText" class="confidence-text">
+                                <div class="confidence-stars">
+                                    <span id="confidenceStars"></span>
+                                </div>
+                                <span class="confidence-percentage">0% Confidence</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Condition Section -->
+                    <div class="condition-section">
+                        <h4><i class="fas fa-notes-medical"></i> Identified Condition</h4>
+                        <div id="conditionName" class="condition-name" role="alert"></div>
+                    </div>
+
+                    <!-- Enhanced Recommendations -->
+                    <div class="recommendations">
+                        <h4><i class="fas fa-hand-holding-medical"></i> Medical Recommendations</h4>
+                        <div id="recommendationText" class="recommendation-text"></div>
+                        <div id="duration" class="duration">
+                            <i class="fas fa-clock"></i>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        async function analyzeSymptoms() {
+            const symptoms = document.getElementById('symptoms').value.trim();
+            if (!symptoms) {
+                alert('Please describe your symptoms');
+                return;
+            }
+
+            const submitBtn = document.querySelector('.submit-btn');
+            const loadingSpinner = submitBtn.querySelector('.loading');
+            const submitIcon = submitBtn.querySelector('.fas');
+            const resultSection = document.getElementById('resultSection');
+
+            try {
+                // Update button state
+                submitBtn.disabled = true;
+                submitIcon.style.display = 'none';
+                loadingSpinner.style.display = 'inline-block';
+                submitBtn.classList.add('loading-state');
+
+                // Make API call
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ symptoms })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Analysis failed');
+                }
+
+                const result = await response.json();
+
+                // Animate confidence bar
+                const confidenceLevel = document.getElementById('confidenceLevel');
+                confidenceLevel.style.width = '0%';
+                setTimeout(() => {
+                    confidenceLevel.style.width = `${result.confidence}%`;
+                }, 100);
+
+                // Update UI with results
+                document.getElementById('confidenceText').innerHTML = `
+                    <div class="confidence-stars">
+                        <span id="confidenceStars"></span>
+                    </div>
+                    <span class="confidence-percentage">${result.confidence}% Confidence</span>
+                `;
+                
+                const severityBadge = document.getElementById('severityBadge');
+                severityBadge.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${result.severity}`;
+                severityBadge.className = `severity-badge ${result.severity.toLowerCase()}`;
+                
+                document.getElementById('conditionName').textContent = result.condition;
+                document.getElementById('recommendationText').textContent = result.suggestion;
+                document.getElementById('duration').innerHTML = `
+                    <i class="fas fa-clock"></i> 
+                    <span>Expected Duration: ${result.duration}</span>
+                `;
+
+                // Show results with animation
+                resultSection.style.display = 'block';
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+
+                // Update confidence stars
+                const confidenceStars = document.getElementById('confidenceStars');
+                let starsHtml = '';
+                for (let i = 0; i < 5; i++) {
+                    if (result.confidence >= (i + 1) * 20) {
+                        starsHtml += '<i class="fas fa-star"></i>';
+                    } else {
+                        starsHtml += '<i class="far fa-star"></i>';
+                    }
+                }
+                confidenceStars.innerHTML = starsHtml;
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to analyze symptoms. Please try again.');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitIcon.style.display = 'inline-block';
+                loadingSpinner.style.display = 'none';
+                submitBtn.classList.remove('loading-state');
+            }
+        }
+
+        // Add input animations
+        const textarea = document.getElementById('symptoms');
+        textarea.addEventListener('focus', () => {
+            textarea.parentElement.classList.add('focused');
+        });
+        textarea.addEventListener('blur', () => {
+            textarea.parentElement.classList.remove('focused');
+        });
+
+        // Toggle severity details
+        function toggleSeverityDetails() {
+            const severityDetails = document.getElementById('severityDetails');
+            severityDetails.style.display = severityDetails.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Toggle info panels
+        function toggleInfo(panelId) {
+            const infoPanel = document.getElementById(`${panelId}Info`);
+            infoPanel.style.display = infoPanel.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
