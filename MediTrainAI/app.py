@@ -15,9 +15,8 @@ import os
 app = Flask(__name__)
 
 # App configurations
-app.config['SECRET_KEY'] = 'your-secret-key-here'  # Change this to a secure secret key
-password = urllib.parse.quote_plus("Koti@6102")
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://root:{password}@localhost/meditrainai'  # Update with your MySQL credentials
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///meditrainai.db')  # Use environment variable or fallback to SQLite
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # File Upload configurations
